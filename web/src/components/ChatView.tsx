@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { sendChat, type ChatMessage, type ChatReply } from "../lib/chat";
+import { clearChatTurns, loadChatTurns, saveChatTurns } from "../lib/chatStorage";
 import { transcribe } from "../lib/stt";
 import { fetchTtsAudio, type Voice } from "../lib/tts";
 import { useRecorder } from "../hooks/useRecorder";
@@ -32,29 +33,37 @@ export function ChatView({ scenarioId, voice, showTranslation, handsFree }: Prop
   const autoUrlRef = useRef<string | null>(null);
   const recordingModeRef = useRef<RecordingMode | null>(null);
 
-  // Refs mirror state so async handlers (TTS chain, recorder onComplete)
+  // Refs mirror state / props so async handlers and cross-effect cleanup
   // see fresh values without re-binding callbacks every render.
   const turnsRef = useRef(turns);
   const handsFreeRef = useRef(handsFree);
   const busyRef = useRef(busy);
   const voiceRef = useRef(voice);
+  const scenarioIdRef = useRef(scenarioId);
   useEffect(() => { turnsRef.current = turns; }, [turns]);
   useEffect(() => { handsFreeRef.current = handsFree; }, [handsFree]);
   useEffect(() => { busyRef.current = busy; }, [busy]);
   useEffect(() => { voiceRef.current = voice; }, [voice]);
+  scenarioIdRef.current = scenarioId;
 
   const recorder = useRecorder({ onComplete: handleRecordingComplete });
 
   useEffect(() => {
-    setTurns([]);
+    const stored = loadChatTurns<Turn>(scenarioId) ?? [];
+    setTurns(stored);
     setError(null);
-    autoSpokenIndexRef.current = -1;
+    // Don't re-speak the last tutor turn on hands-free when restoring history.
+    autoSpokenIndexRef.current = stored.length - 1;
     autoAudioRef.current?.pause();
     if (autoUrlRef.current) {
       URL.revokeObjectURL(autoUrlRef.current);
       autoUrlRef.current = null;
     }
   }, [scenarioId]);
+
+  useEffect(() => {
+    if (turns.length > 0) saveChatTurns(scenarioIdRef.current, turns);
+  }, [turns]);
 
   useEffect(() => {
     return () => {
@@ -131,6 +140,23 @@ export function ChatView({ scenarioId, voice, showTranslation, handsFree }: Prop
   async function start() {
     if (busy) return;
     await callApi([]);
+  }
+
+  function reset() {
+    clearChatTurns(scenarioIdRef.current);
+    setTurns([]);
+    setInput("");
+    setError(null);
+    autoSpokenIndexRef.current = -1;
+    autoAudioRef.current?.pause();
+    if (autoUrlRef.current) {
+      URL.revokeObjectURL(autoUrlRef.current);
+      autoUrlRef.current = null;
+    }
+    if (recorder.state === "recording") {
+      recordingModeRef.current = null;
+      recorder.stop();
+    }
   }
 
   async function send() {
@@ -237,6 +263,14 @@ export function ChatView({ scenarioId, voice, showTranslation, handsFree }: Prop
 
       {(error || recorder.error) && (
         <div className="error">{error ?? recorder.error}</div>
+      )}
+
+      {turns.length > 0 && (
+        <div className="chat-actions">
+          <button type="button" className="link-button" onClick={reset}>
+            ⟳ Reset conversation
+          </button>
+        </div>
       )}
 
       {turns.length > 0 && (

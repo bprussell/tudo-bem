@@ -299,6 +299,24 @@ h1 {
 }
 .bubble.pending { color: var(--muted); }
 
+.chat-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+.link-button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.25rem 0.5rem;
+}
+.link-button:hover {
+  color: var(--text);
+}
+
 .chat-input {
   display: flex;
   gap: 0.5rem;
