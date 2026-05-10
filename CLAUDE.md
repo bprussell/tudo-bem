@@ -56,6 +56,18 @@ A personal-use European Portuguese travel-prep PWA for a trip to Portugal. The a
 
 There is no equivalent mock for `/api/tts` — it requires a real Azure Speech key.
 
+## Project scope (explicit non-goals)
+
+This is a **single-user personal app**. It will not be made public. Don't optimize for things that don't matter for that scope:
+
+- **Accessibility**: don't worry about screen readers, focus traps, ARIA-live, keyboard nav beyond what's there. The user is sighted and uses touch + a real keyboard.
+- **Scalability**: there's exactly one user. Don't add caching layers, queues, scaling concerns, multi-tenancy.
+- **Long-term maintainability**: don't refactor for unborn future contributors. Magic strings are fine. Prop drilling is fine. A 300-line component is fine if it works.
+- **Privacy of personal context in `userContext.ts`**: the user has explicitly accepted the risk. Kids' ages, family-not-home detail, AI-engineer / consulting bio — all fine to keep in the repo. Don't move it to a `.local.ts` or pull it out at runtime "for safety".
+- **Billing exposure**: Azure has spending limits the user has hit before; the platform will cut them off. Don't add elaborate per-IP rate limiting or token-budget guards. Auth (#5, now landed) is the meaningful protection.
+
+When the review agent or a fresh Claude session flags something in one of those categories, **acknowledge it briefly and move on** — don't sink time into addressing it.
+
 ## Conventions
 
 - Keep commits small and logically focused; the user often reviews on phone.
