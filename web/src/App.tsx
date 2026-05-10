@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Home } from "./routes/Home";
 import { Scenario } from "./routes/Scenario";
 import { useHashRoute } from "./hooks/useHashRoute";
@@ -14,14 +14,19 @@ const VOICES: { id: Voice; label: string }[] = [
 export function App() {
   const hash = useHashRoute();
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
+  const isFirstSettingsRender = useRef(true);
 
   useEffect(() => {
+    if (isFirstSettingsRender.current) {
+      isFirstSettingsRender.current = false;
+      return;
+    }
     saveSettings(settings);
   }, [settings]);
 
-  const path = hash.replace(/^#/, "");
+  const path = hash.replace(/^#/, "").replace(/\?.*$/, "").replace(/\/$/, "");
   const scenarioMatch = path.match(/^\/([a-z-]+)$/);
-  const isHome = path === "/" || path === "";
+  const isHome = path === "" || path === "/";
 
   return (
     <main>

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchTtsAudio, type Rate, type Voice } from "../lib/tts";
 
 type Props = {
@@ -11,6 +11,12 @@ export function TtsButtons({ text, voice }: Props) {
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lastUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (lastUrlRef.current) URL.revokeObjectURL(lastUrlRef.current);
+    };
+  }, []);
 
   async function play(rate: Rate) {
     setError(null);

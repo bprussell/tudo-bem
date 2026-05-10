@@ -24,12 +24,11 @@ export function ChatView({ scenarioId, voice, showTranslation }: Props) {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const startedRef = useRef(false);
   const endRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setTurns([]);
-    startedRef.current = false;
+    setError(null);
   }, [scenarioId]);
 
   useEffect(() => {
@@ -37,14 +36,14 @@ export function ChatView({ scenarioId, voice, showTranslation }: Props) {
   }, [turns.length]);
 
   async function start() {
-    if (startedRef.current || busy) return;
-    startedRef.current = true;
+    if (busy) return;
     await callApi([]);
   }
 
   async function send() {
+    if (busy) return;
     const text = input.trim();
-    if (!text || busy) return;
+    if (!text) return;
     const next: Turn[] = [...turns, { role: "user", content: text }];
     setTurns(next);
     setInput("");
