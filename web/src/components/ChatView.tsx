@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { sendChat, type ChatMessage, type ChatReply } from "../lib/chat";
+import { transcribe } from "../lib/stt";
 import type { Voice } from "../lib/tts";
+import { useRecorder } from "../hooks/useRecorder";
 import { TtsButtons } from "./TtsButtons";
 
 type TutorTurn = {
@@ -23,8 +25,10 @@ export function ChatView({ scenarioId, voice, showTranslation }: Props) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
+  const recorder = useRecorder();
 
   useEffect(() => {
     setTurns([]);
@@ -48,6 +52,27 @@ export function ChatView({ scenarioId, voice, showTranslation }: Props) {
     setTurns(next);
     setInput("");
     await callApi(toApiMessages(next));
+  }
+
+  async function toggleMic() {
+    if (busy || transcribing) return;
+    if (recorder.state === "recording") {
+      const blob = await recorder.stop();
+      if (!blob) return;
+      setTranscribing(true);
+      setError(null);
+      try {
+        const reply = await transcribe(blob);
+        setInput((prev) => (prev ? `${prev} ${reply.transcript}` : reply.transcript));
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e));
+      } finally {
+        setTranscribing(false);
+      }
+      return;
+    }
+    setError(null);
+    await recorder.start();
   }
 
   async function callApi(history: ChatMessage[]) {
@@ -84,7 +109,9 @@ export function ChatView({ scenarioId, voice, showTranslation }: Props) {
         </div>
       )}
 
-      {error && <div className="error">{error}</div>}
+      {(error || recorder.error) && (
+        <div className="error">{error ?? recorder.error}</div>
+      )}
 
       {turns.length > 0 && (
         <form
@@ -94,15 +121,36 @@ export function ChatView({ scenarioId, voice, showTranslation }: Props) {
             void send();
           }}
         >
+          <button
+            type="button"
+            className={`mic ${recorder.state}`}
+            onClick={() => void toggleMic()}
+            disabled={busy || transcribing}
+            aria-label={recorder.state === "recording" ? "Stop recording" : "Record voice"}
+            title={recorder.state === "recording" ? "Stop" : "Record"}
+          >
+            {transcribing ? "…" : recorder.state === "recording" ? "⏹" : "🎤"}
+          </button>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Escreva em português…"
-            disabled={busy}
+            placeholder={
+              recorder.state === "recording"
+                ? "A gravar…"
+                : transcribing
+                ? "A transcrever…"
+                : "Escreva em português…"
+            }
+            disabled={busy || recorder.state === "recording" || transcribing}
             autoFocus
           />
-          <button type="submit" disabled={busy || !input.trim()}>Send</button>
+          <button
+            type="submit"
+            disabled={busy || transcribing || recorder.state !== "idle" || !input.trim()}
+          >
+            Send
+          </button>
         </form>
       )}
     </div>

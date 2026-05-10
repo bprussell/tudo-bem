@@ -255,6 +255,29 @@ h1 {
   opacity: 0.5;
   cursor: not-allowed;
 }
+.chat-input button.mic {
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 0.55rem 0.7rem;
+  font-size: 1.1rem;
+  min-width: 2.6rem;
+}
+.chat-input button.mic:hover:not(:disabled) {
+  background: var(--surface-3);
+}
+.chat-input button.mic.recording {
+  background: var(--error);
+  color: var(--bg);
+  animation: mic-pulse 1.1s ease-in-out infinite;
+}
+.chat-input button.mic.stopping {
+  background: var(--warning);
+  color: var(--bg);
+}
+@keyframes mic-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+  50% { box-shadow: 0 0 0 8px rgba(255, 107, 107, 0); }
+}
 
 /* Misc */
 .error {
