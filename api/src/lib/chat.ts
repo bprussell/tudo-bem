@@ -85,6 +85,7 @@ export const KNOWN_MOCK_SCENARIOS = [
   "beach",
   "lost",
   "photo",
+  "numbers",
 ] as const;
 
 export function mockBankFor(scenarioId: string): MockBank {
@@ -247,6 +248,16 @@ export function mockBankFor(scenarioId: string): MockBank {
           { pt: "Olho! Pronto, tirei duas — vejam se gostam.", en: "Cheese! There, I took two — see if you like them." },
           { pt: "Vinte anos de casados, parabéns! Tiro mais uma com o mar ao fundo.", en: "Twenty years married, congratulations! I'll take another with the sea behind." },
           { pt: "Querem que eu vos tire também com o vosso telemóvel? Boa viagem!", en: "Want me to take some on your phone too? Have a great trip!" },
+        ],
+      };
+    case "numbers":
+      return {
+        greeting: { pt: "Olá! Vamos treinar números. Quer começar por preços, horas ou datas?", en: "Hi! Let's drill numbers. Want to start with prices, times, or dates?" },
+        followUps: [
+          { pt: "Boa. Diga em português: 17 euros e 80 cêntimos.", en: "Good. Say in Portuguese: 17 euros and 80 cents." },
+          { pt: "Quase. Em pt-PT é 'dezassete', não 'dezesete'. Repita.", en: "Almost. In pt-PT it's 'dezassete', not 'dezesete'. Repeat." },
+          { pt: "Agora horas: a sua reserva no Fortaleza é às 20:30. Como diz?", en: "Now times: your Fortaleza reservation is at 20:30. How do you say it?" },
+          { pt: "Boa! 'Às oito e meia da noite'. Já está fluente nisto.", en: "Good! 'At eight thirty in the evening'. You're getting fluent at this." },
         ],
       };
     default:

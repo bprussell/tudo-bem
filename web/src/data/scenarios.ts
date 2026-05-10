@@ -15,6 +15,7 @@ import { lisboaPhrases } from "./lisboa";
 import { beachPhrases } from "./beach";
 import { lostPhrases } from "./lost";
 import { photoPhrases } from "./photo";
+import { numbersPhrases } from "./numbers";
 
 export const SCENARIOS: Scenario[] = [
   // Trip-specific scenarios — see api/src/userContext.ts for the personal
@@ -98,6 +99,14 @@ export const SCENARIOS: Scenario[] = [
     emoji: "🚨",
     blurb: "Filing a police report, replacing a passport, calling the embassy.",
     phrases: lostPhrases,
+  },
+  {
+    id: "numbers",
+    title: "Numbers, prices, time",
+    titlePt: "Números, preços, horas",
+    emoji: "🔢",
+    blurb: "Drill prices, telling time, dates, phone numbers, ordinals.",
+    phrases: numbersPhrases,
   },
 
   // Generic everyday scenarios
