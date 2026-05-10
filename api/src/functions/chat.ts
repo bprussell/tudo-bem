@@ -1,12 +1,15 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 import { SCENARIOS } from "../scenarios";
 
-type IncomingMessage = { role: "user" | "assistant"; content: string };
+type Role = "user" | "assistant";
+type IncomingMessage = { role: Role; content: string };
 type ChatRequest = { scenarioId: string; messages: IncomingMessage[] };
 type ChatReply = { reply_pt: string; reply_en: string; tip: string | null; mock?: boolean };
 
 const API_VERSION = process.env.AZURE_OPENAI_API_VERSION ?? "2024-10-21";
 const MAX_HISTORY = 40;
+const MAX_MESSAGE_CHARS = 2000;
+const VALID_ROLES = new Set<Role>(["user", "assistant"]);
 
 export async function chat(
   request: HttpRequest,
@@ -25,6 +28,20 @@ export async function chat(
   if (body.messages.length > MAX_HISTORY) {
     return { status: 400, jsonBody: { error: `messages exceeds ${MAX_HISTORY}` } };
   }
+  for (const m of body.messages) {
+    if (!m || typeof m !== "object") {
+      return { status: 400, jsonBody: { error: "each message must be an object" } };
+    }
+    if (!VALID_ROLES.has(m.role)) {
+      return { status: 400, jsonBody: { error: "message.role must be 'user' or 'assistant'" } };
+    }
+    if (typeof m.content !== "string") {
+      return { status: 400, jsonBody: { error: "message.content must be a string" } };
+    }
+    if (m.content.length > MAX_MESSAGE_CHARS) {
+      return { status: 400, jsonBody: { error: `message.content exceeds ${MAX_MESSAGE_CHARS} chars` } };
+    }
+  }
   const persona = SCENARIOS[body.scenarioId];
   if (!persona) {
     return { status: 404, jsonBody: { error: `unknown scenario: ${body.scenarioId}` } };
@@ -33,9 +50,15 @@ export async function chat(
   const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
   const key = process.env.AZURE_OPENAI_KEY;
   const deployment = process.env.AZURE_OPENAI_DEPLOYMENT;
-  const mockMode = process.env.MOCK_MODE === "1" || !endpoint || !key || !deployment;
+  const explicitMock = process.env.MOCK_MODE === "1";
+  const mockMode = explicitMock || !endpoint || !key || !deployment;
 
   if (mockMode) {
+    if (!explicitMock) {
+      context.warn(
+        "Azure OpenAI env vars missing — serving mock replies. Set AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_KEY, AZURE_OPENAI_DEPLOYMENT."
+      );
+    }
     return { status: 200, jsonBody: mockReply(body) };
   }
 
@@ -79,41 +102,81 @@ export async function chat(
   return { status: 200, jsonBody: parsed };
 }
 
+type MockBank = {
+  greeting: { pt: string; en: string };
+  followUps: { pt: string; en: string }[];
+};
+
 function mockReply(req: ChatRequest): ChatReply {
-  const lastUser = [...req.messages].reverse().find((m) => m.role === "user")?.content ?? "";
-  const opener = openerFor(req.scenarioId);
-  const reply_pt = lastUser
-    ? `${opener.ack} (Recebi: "${truncate(lastUser, 40)}")`
-    : opener.greeting;
-  return {
-    reply_pt,
-    reply_en: lastUser
-      ? `(mock) Got your message. Configure AZURE_OPENAI_* for real replies.`
-      : `(mock) ${opener.greetingEn}`,
-    tip: "Mock mode is active. Set AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_KEY, AZURE_OPENAI_DEPLOYMENT to use the real model.",
-    mock: true,
-  };
+  const bank = mockBankFor(req.scenarioId);
+  const userTurns = req.messages.filter((m) => m.role === "user").length;
+  const tip = "Mock mode active — set AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_KEY, AZURE_OPENAI_DEPLOYMENT for real replies.";
+
+  if (userTurns === 0) {
+    return { reply_pt: bank.greeting.pt, reply_en: bank.greeting.en, tip, mock: true };
+  }
+  const choice = bank.followUps[(userTurns - 1) % bank.followUps.length];
+  return { reply_pt: choice.pt, reply_en: choice.en, tip, mock: true };
 }
 
-function openerFor(scenarioId: string): { greeting: string; greetingEn: string; ack: string } {
+function mockBankFor(scenarioId: string): MockBank {
   switch (scenarioId) {
     case "cafe":
-      return { greeting: "Bom dia! O que vai querer?", greetingEn: "Good morning! What would you like?", ack: "Com certeza." };
+      return {
+        greeting: { pt: "Bom dia! O que vai querer?", en: "Good morning! What would you like?" },
+        followUps: [
+          { pt: "Com certeza, já trago.", en: "Of course, I'll bring it right away." },
+          { pt: "Mais alguma coisa, se faz favor?", en: "Anything else, please?" },
+          { pt: "Aqui tem. Bom proveito!", en: "Here you go. Enjoy!" },
+          { pt: "São cinco euros, se faz favor.", en: "That'll be five euros, please." },
+        ],
+      };
     case "restaurant":
-      return { greeting: "Boa noite! Aqui está a ementa.", greetingEn: "Good evening! Here's the menu.", ack: "Muito bem." };
+      return {
+        greeting: { pt: "Boa noite! Aqui está a ementa.", en: "Good evening! Here's the menu." },
+        followUps: [
+          { pt: "Hoje o prato do dia é bacalhau à brás.", en: "Today's dish of the day is bacalhau à brás." },
+          { pt: "Para beber, prefere água ou vinho?", en: "To drink, would you prefer water or wine?" },
+          { pt: "Muito bem, anotado.", en: "Very good, noted." },
+          { pt: "A casa de banho é por aquela porta.", en: "The bathroom is through that door." },
+        ],
+      };
     case "taxi":
-      return { greeting: "Olá! Para onde vamos?", greetingEn: "Hi! Where are we going?", ack: "Com certeza, já vamos." };
+      return {
+        greeting: { pt: "Olá! Para onde vamos?", en: "Hi! Where are we going?" },
+        followUps: [
+          { pt: "Está bem, são uns vinte minutos com este trânsito.", en: "OK, about twenty minutes with this traffic." },
+          { pt: "Aceito cartão, sim.", en: "Yes, I take card." },
+          { pt: "Já chegámos. São doze euros.", en: "We've arrived. That'll be twelve euros." },
+          { pt: "Quer que espere?", en: "Would you like me to wait?" },
+        ],
+      };
     case "hotel":
-      return { greeting: "Boa tarde! Tem reserva?", greetingEn: "Good afternoon! Do you have a reservation?", ack: "Vou verificar." };
+      return {
+        greeting: { pt: "Boa tarde! Tem reserva?", en: "Good afternoon! Do you have a reservation?" },
+        followUps: [
+          { pt: "Posso ver o seu passaporte, se faz favor?", en: "May I see your passport, please?" },
+          { pt: "O pequeno-almoço é das sete às dez, no primeiro andar.", en: "Breakfast is from seven to ten, on the first floor." },
+          { pt: "A senha do Wi-Fi está no cartão da chave.", en: "The Wi-Fi password is on the keycard." },
+          { pt: "O check-out é até às onze.", en: "Check-out is by eleven." },
+        ],
+      };
     case "directions":
-      return { greeting: "Olá! Em que posso ajudar?", greetingEn: "Hi! How can I help?", ack: "Vou explicar." };
+      return {
+        greeting: { pt: "Olá! Em que posso ajudar?", en: "Hi! How can I help?" },
+        followUps: [
+          { pt: "Siga em frente e vire à direita no segundo cruzamento.", en: "Go straight and turn right at the second intersection." },
+          { pt: "É perto, uns cinco minutos a pé.", en: "It's close, about five minutes on foot." },
+          { pt: "Pode apanhar o elétrico 28 ali à esquina.", en: "You can catch tram 28 just round the corner." },
+          { pt: "A paragem do autocarro fica do outro lado da rua.", en: "The bus stop is across the street." },
+        ],
+      };
     default:
-      return { greeting: "Olá!", greetingEn: "Hi!", ack: "Está bem." };
+      return {
+        greeting: { pt: "Olá!", en: "Hi!" },
+        followUps: [{ pt: "Está bem.", en: "All right." }],
+      };
   }
-}
-
-function truncate(s: string, n: number): string {
-  return s.length <= n ? s : s.slice(0, n - 1) + "…";
 }
 
 app.http("chat", {
