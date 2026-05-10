@@ -80,14 +80,14 @@ The `/api/tts` endpoint accepts `?rate=normal|slow` and builds SSML:
 - [ ] Pronunciation assessment scores rendered per word
 - [ ] Hands-free conversation mode
 
-### M4 — Scenario library (5 of 6 shipped)
+### M4 — Scenario library (shipped)
 - [x] Café
 - [x] Restaurant
 - [x] Taxi
 - [x] Hotel check-in
 - [x] Asking for directions
-- [ ] Pharmacy
-- [ ] Each scenario: warm-up vocab, role-play, debrief
+- [x] Pharmacy
+- [ ] Each scenario: warm-up vocab, role-play, debrief (stretch)
 
 ### Before first public deploy
 - [ ] Replace placeholder PWA icons in `web/public/` with a real design
