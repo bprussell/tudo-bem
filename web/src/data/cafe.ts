@@ -1,8 +1,4 @@
-export type Phrase = {
-  pt: string;
-  en: string;
-  note?: string;
-};
+import type { Phrase } from "./types";
 
 export const cafePhrases: Phrase[] = [
   {
