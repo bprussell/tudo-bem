@@ -35,10 +35,16 @@ Copy `api/local.settings.json.example` → `api/local.settings.json` and fill in
 - `AZURE_SPEECH_REGION` — e.g. `westeurope`
 - `AZURE_OPENAI_ENDPOINT` — e.g. `https://<name>.openai.azure.com`
 - `AZURE_OPENAI_KEY`
-- `AZURE_OPENAI_DEPLOYMENT` — your deployment name for `gpt-5.4-mini`
+- `AZURE_OPENAI_DEPLOYMENT` — your deployment name (target: a cheap multilingual model such as gpt-5.4-mini; verify the exact name in the Azure portal — see PLAN.md)
+
+If any of `AZURE_OPENAI_*` are missing, `/api/chat` automatically falls back
+to canned mock replies so you can develop the UI without provisioning Azure
+resources. Set `MOCK_MODE=1` to force this even when keys are present.
 
 In production these are configured as Static Web App application settings.
 
 ## Status
 
-M1 (TTS demo) — scaffolded, not yet deployed.
+- M1 (TTS demo) and M2 (conversational tutor, mocked) shipped on the dev branch.
+- 5 scenarios: café, restaurant, taxi, hotel check-in, directions.
+- Not yet deployed — see "Before first public deploy" in PLAN.md for the checklist.
