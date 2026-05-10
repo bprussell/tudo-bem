@@ -7,7 +7,9 @@
     "AZURE_SPEECH_REGION": "westeurope",
     "AZURE_OPENAI_ENDPOINT": "https://<name>.openai.azure.com",
     "AZURE_OPENAI_KEY": "<your-openai-key>",
-    "AZURE_OPENAI_DEPLOYMENT": "gpt-5.4-mini"
+    "AZURE_OPENAI_DEPLOYMENT": "gpt-5.4-mini",
+    "AZURE_OPENAI_API_VERSION": "2024-10-21",
+    "MOCK_MODE": "0"
   },
   "Host": {
     "CORS": "*"
