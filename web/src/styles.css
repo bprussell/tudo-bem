@@ -357,6 +357,16 @@ h1 {
   50% { box-shadow: 0 0 0 8px rgba(255, 107, 107, 0); }
 }
 
+.hands-free-indicator {
+  align-self: flex-start;
+  background: var(--surface-2);
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.85rem;
+}
+
 /* Misc */
 .error {
   background: rgba(255, 107, 107, 0.1);

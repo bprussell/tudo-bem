@@ -38,6 +38,7 @@ export function App() {
           scenarioId={scenarioMatch[1]}
           voice={settings.voice}
           showTranslation={settings.showTranslation}
+          handsFree={settings.handsFree}
         />
       ) : (
         <div className="missing">
@@ -79,6 +80,14 @@ function SettingsBar({
           onChange={(e) => onChange({ ...settings, showTranslation: e.target.checked })}
         />
         EN
+      </label>
+      <label className="toggle" title="Auto-play tutor replies and (in chat) auto-record after they finish.">
+        <input
+          type="checkbox"
+          checked={settings.handsFree}
+          onChange={(e) => onChange({ ...settings, handsFree: e.target.checked })}
+        />
+        Hands-free
       </label>
     </div>
   );

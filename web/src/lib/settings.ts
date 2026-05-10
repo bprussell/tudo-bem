@@ -3,6 +3,7 @@ import type { Voice } from "./tts";
 export type Settings = {
   voice: Voice;
   showTranslation: boolean;
+  handsFree: boolean;
 };
 
 const KEY = "tudo-bem.settings";
@@ -10,6 +11,7 @@ const KEY = "tudo-bem.settings";
 const DEFAULTS: Settings = {
   voice: "pt-PT-RaquelNeural",
   showTranslation: true,
+  handsFree: false,
 };
 
 export function loadSettings(): Settings {

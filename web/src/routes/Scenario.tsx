@@ -10,9 +10,10 @@ type Props = {
   scenarioId: string;
   voice: Voice;
   showTranslation: boolean;
+  handsFree: boolean;
 };
 
-export function Scenario({ scenarioId, voice, showTranslation }: Props) {
+export function Scenario({ scenarioId, voice, showTranslation, handsFree }: Props) {
   const scenario = getScenario(scenarioId);
   const [tab, setTab] = useState<Tab>("phrases");
 
@@ -65,6 +66,7 @@ export function Scenario({ scenarioId, voice, showTranslation }: Props) {
           scenarioId={scenario.id}
           voice={voice}
           showTranslation={showTranslation}
+          handsFree={handsFree}
         />
       )}
     </div>

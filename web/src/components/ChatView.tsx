@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { sendChat, type ChatMessage, type ChatReply } from "../lib/chat";
 import { transcribe } from "../lib/stt";
-import type { Voice } from "../lib/tts";
+import { fetchTtsAudio, type Voice } from "../lib/tts";
 import { useRecorder } from "../hooks/useRecorder";
 import { TtsButtons } from "./TtsButtons";
 
@@ -19,21 +19,83 @@ type Props = {
   scenarioId: string;
   voice: Voice;
   showTranslation: boolean;
+  handsFree: boolean;
 };
 
-export function ChatView({ scenarioId, voice, showTranslation }: Props) {
+export function ChatView({ scenarioId, voice, showTranslation, handsFree }: Props) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
+  const [autoSpeaking, setAutoSpeaking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
   const recorder = useRecorder();
+  const autoSpokenIndexRef = useRef(-1);
+  const autoAudioRef = useRef<HTMLAudioElement | null>(null);
+  const autoUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     setTurns([]);
     setError(null);
+    autoSpokenIndexRef.current = -1;
+    autoAudioRef.current?.pause();
+    if (autoUrlRef.current) {
+      URL.revokeObjectURL(autoUrlRef.current);
+      autoUrlRef.current = null;
+    }
   }, [scenarioId]);
+
+  useEffect(() => {
+    return () => {
+      autoAudioRef.current?.pause();
+      if (autoUrlRef.current) URL.revokeObjectURL(autoUrlRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!handsFree) {
+      autoAudioRef.current?.pause();
+      setAutoSpeaking(false);
+    }
+  }, [handsFree]);
+
+  useEffect(() => {
+    if (!handsFree) return;
+    const lastIndex = turns.length - 1;
+    const last = turns[lastIndex];
+    if (!last || last.role !== "tutor") return;
+    if (lastIndex === autoSpokenIndexRef.current) return;
+    autoSpokenIndexRef.current = lastIndex;
+    void autoSpeak(last.reply.reply_pt);
+  }, [turns, handsFree, voice]);
+
+  async function autoSpeak(text: string) {
+    setAutoSpeaking(true);
+    try {
+      const url = await fetchTtsAudio(text, "normal", voice);
+      if (autoUrlRef.current) URL.revokeObjectURL(autoUrlRef.current);
+      autoUrlRef.current = url;
+      if (!autoAudioRef.current) autoAudioRef.current = new Audio();
+      autoAudioRef.current.src = url;
+      await autoAudioRef.current.play();
+      await new Promise<void>((resolve) => {
+        const audio = autoAudioRef.current!;
+        const done = () => {
+          audio.removeEventListener("ended", done);
+          audio.removeEventListener("error", done);
+          resolve();
+        };
+        audio.addEventListener("ended", done);
+        audio.addEventListener("error", done);
+      });
+    } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return;
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setAutoSpeaking(false);
+    }
+  }
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -107,6 +169,10 @@ export function ChatView({ scenarioId, voice, showTranslation }: Props) {
           {busy && <div className="bubble tutor pending">…</div>}
           <div ref={endRef} />
         </div>
+      )}
+
+      {autoSpeaking && (
+        <div className="hands-free-indicator">🔊 A falar…</div>
       )}
 
       {(error || recorder.error) && (
