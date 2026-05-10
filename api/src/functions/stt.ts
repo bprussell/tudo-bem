@@ -6,6 +6,7 @@ type STTRequest = {
   referenceText?: string;
 };
 
+// STT response shapes mirrored in web/src/lib/stt.ts — keep in sync (issue #9).
 type WordScore = { word: string; accuracy: number };
 type Pronunciation = {
   accuracy: number;

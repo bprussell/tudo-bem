@@ -4,6 +4,7 @@ import { SCENARIOS } from "../scenarios";
 type Role = "user" | "assistant";
 type IncomingMessage = { role: Role; content: string };
 type ChatRequest = { scenarioId: string; messages: IncomingMessage[] };
+// ChatReply shape is mirrored in web/src/lib/chat.ts — keep in sync (issue #9).
 type ChatReply = { reply_pt: string; reply_en: string; tip: string | null; mock?: boolean };
 
 const API_VERSION = process.env.AZURE_OPENAI_API_VERSION ?? "2024-10-21";

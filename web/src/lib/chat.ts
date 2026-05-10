@@ -1,5 +1,6 @@
 export type ChatMessage = { role: "user" | "assistant"; content: string };
 
+// ChatReply shape is mirrored in api/src/functions/chat.ts — keep in sync (issue #9).
 export type ChatReply = {
   reply_pt: string;
   reply_en: string;

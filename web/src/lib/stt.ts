@@ -1,3 +1,4 @@
+// STT response shapes mirrored in api/src/functions/stt.ts — keep in sync (issue #9).
 export type WordScore = { word: string; accuracy: number };
 export type Pronunciation = {
   accuracy: number;
