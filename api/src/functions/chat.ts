@@ -171,6 +171,16 @@ function mockBankFor(scenarioId: string): MockBank {
           { pt: "A paragem do autocarro fica do outro lado da rua.", en: "The bus stop is across the street." },
         ],
       };
+    case "pharmacy":
+      return {
+        greeting: { pt: "Bom dia! Em que posso ajudar?", en: "Good morning! How can I help?" },
+        followUps: [
+          { pt: "Recomendo paracetamol. Toma de oito em oito horas, depois das refeições.", en: "I recommend paracetamol. Take it every 8 hours, after meals." },
+          { pt: "Para isso é preciso receita médica. Tem médico de família cá?", en: "For that you need a prescription. Do you have a family doctor here?" },
+          { pt: "Temos um xarope que costuma ajudar. É para tomar duas vezes ao dia.", en: "We have a syrup that usually helps. Take it twice a day." },
+          { pt: "Se piorar, deve mesmo ver um médico.", en: "If it gets worse, you really should see a doctor." },
+        ],
+      };
     default:
       return {
         greeting: { pt: "Olá!", en: "Hi!" },

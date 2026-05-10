@@ -4,6 +4,7 @@ import { restaurantPhrases } from "./restaurant";
 import { taxiPhrases } from "./taxi";
 import { hotelPhrases } from "./hotel";
 import { directionsPhrases } from "./directions";
+import { pharmacyPhrases } from "./pharmacy";
 
 export const SCENARIOS: Scenario[] = [
   {
@@ -45,6 +46,14 @@ export const SCENARIOS: Scenario[] = [
     emoji: "🗺️",
     blurb: "Find the metro, a famous spot, or a bus stop.",
     phrases: directionsPhrases,
+  },
+  {
+    id: "pharmacy",
+    title: "Pharmacy",
+    titlePt: "Farmácia",
+    emoji: "💊",
+    blurb: "Ask for medicine, describe symptoms, find a pharmacy on duty.",
+    phrases: pharmacyPhrases,
   },
 ];
 
