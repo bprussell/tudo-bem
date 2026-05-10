@@ -2,6 +2,7 @@ import type { Phrase } from "../data/types";
 import type { Voice } from "../lib/tts";
 import { TtsButtons } from "./TtsButtons";
 import { PracticeButton } from "./PracticeButton";
+import { StarButton } from "./StarButton";
 
 type Props = {
   phrases: Phrase[];
@@ -14,9 +15,14 @@ export function PhraseList({ phrases, voice, showTranslation }: Props) {
     <ol className="phrases">
       {phrases.map((p, i) => (
         <li key={i}>
-          <div className="pt">{p.pt}</div>
-          {showTranslation && <div className="en">{p.en}</div>}
-          {p.note && <div className="note">{p.note}</div>}
+          <div className="phrase-row">
+            <div className="phrase-text">
+              <div className="pt">{p.pt}</div>
+              {showTranslation && <div className="en">{p.en}</div>}
+              {p.note && <div className="note">{p.note}</div>}
+            </div>
+            <StarButton pt={p.pt} />
+          </div>
           <TtsButtons text={p.pt} voice={voice} />
           <PracticeButton referenceText={p.pt} />
         </li>

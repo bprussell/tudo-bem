@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Home } from "./routes/Home";
 import { Scenario } from "./routes/Scenario";
+import { Favorites } from "./routes/Favorites";
 import { useHashRoute } from "./hooks/useHashRoute";
 import { loadSettings, saveSettings, type Settings } from "./lib/settings";
 import type { Voice } from "./lib/tts";
@@ -27,12 +28,18 @@ export function App() {
   const path = hash.replace(/^#/, "").replace(/\?.*$/, "").replace(/\/$/, "");
   const scenarioMatch = path.match(/^\/([a-z-]+)$/);
   const isHome = path === "" || path === "/";
+  const isFavorites = path === "/favorites";
 
   return (
     <main>
       <SettingsBar settings={settings} onChange={setSettings} />
       {isHome ? (
         <Home />
+      ) : isFavorites ? (
+        <Favorites
+          voice={settings.voice}
+          showTranslation={settings.showTranslation}
+        />
       ) : scenarioMatch ? (
         <Scenario
           scenarioId={scenarioMatch[1]}

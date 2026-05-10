@@ -1,12 +1,27 @@
 import { SCENARIOS } from "../data/scenarios";
+import { favoritesCount } from "../lib/favorites";
 
 export function Home() {
+  const favCount = favoritesCount();
+
   return (
     <div className="home">
       <header>
         <h1>Tudo Bem</h1>
         <p className="tag">Practice European Portuguese for your trip.</p>
       </header>
+
+      <a href="#/favorites" className="favorites-card">
+        <span className="emoji" aria-hidden>⭐</span>
+        <div>
+          <div className="title">My phrases</div>
+          <div className="blurb">
+            {favCount === 0
+              ? "Star phrases from any scenario to drill them here."
+              : `${favCount} ${favCount === 1 ? "phrase" : "phrases"} saved.`}
+          </div>
+        </div>
+      </a>
 
       <ul className="scenario-grid">
         {SCENARIOS.map((s) => (
