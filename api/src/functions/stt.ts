@@ -41,16 +41,17 @@ export async function stt(
     return { status: 400, jsonBody: { error: "contentType required" } };
   }
 
-  let audioBytes: Buffer;
+  let audioBuffer: ArrayBuffer;
   try {
-    audioBytes = Buffer.from(body.audioBase64, "base64");
+    const buf = Buffer.from(body.audioBase64, "base64");
+    audioBuffer = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
   } catch {
     return { status: 400, jsonBody: { error: "invalid base64 audio" } };
   }
-  if (audioBytes.byteLength === 0) {
+  if (audioBuffer.byteLength === 0) {
     return { status: 400, jsonBody: { error: "empty audio" } };
   }
-  if (audioBytes.byteLength > MAX_AUDIO_BYTES) {
+  if (audioBuffer.byteLength > MAX_AUDIO_BYTES) {
     return { status: 400, jsonBody: { error: `audio exceeds ${MAX_AUDIO_BYTES} bytes` } };
   }
 
@@ -95,7 +96,7 @@ export async function stt(
     headers["Pronunciation-Assessment"] = Buffer.from(config, "utf8").toString("base64");
   }
 
-  const upstream = await fetch(url.toString(), { method: "POST", headers, body: audioBytes });
+  const upstream = await fetch(url.toString(), { method: "POST", headers, body: audioBuffer });
 
   if (!upstream.ok) {
     const detail = await upstream.text();
