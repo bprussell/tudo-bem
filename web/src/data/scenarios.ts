@@ -11,6 +11,9 @@ import { airbnbPhrases } from "./airbnb";
 import { sintraPhrases } from "./sintra";
 import { fortalezaPhrases } from "./fortaleza";
 import { wineryPhrases } from "./winery";
+import { lisboaPhrases } from "./lisboa";
+import { beachPhrases } from "./beach";
+import { lostPhrases } from "./lost";
 
 export const SCENARIOS: Scenario[] = [
   // Trip-specific scenarios — see api/src/userContext.ts for the personal
@@ -62,6 +65,30 @@ export const SCENARIOS: Scenario[] = [
     emoji: "🍷",
     blurb: "Wine vocab, grape varieties, shipping bottles home.",
     phrases: wineryPhrases,
+  },
+  {
+    id: "lisboa",
+    title: "Lisboa sights",
+    titlePt: "Lisboa",
+    emoji: "🚋",
+    blurb: "Tram 28, pastéis de Belém, miradouros, Fado, Alfama.",
+    phrases: lisboaPhrases,
+  },
+  {
+    id: "beach",
+    title: "Beach day",
+    titlePt: "Dia de praia",
+    emoji: "🏖️",
+    blurb: "Loungers, sun umbrella, lifeguard flags, beach bar.",
+    phrases: beachPhrases,
+  },
+  {
+    id: "lost",
+    title: "Lost or stolen",
+    titlePt: "Perdido ou roubado",
+    emoji: "🚨",
+    blurb: "Filing a police report, replacing a passport, calling the embassy.",
+    phrases: lostPhrases,
   },
 
   // Generic everyday scenarios

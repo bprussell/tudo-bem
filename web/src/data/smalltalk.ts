@@ -21,8 +21,18 @@ export const smalltalkPhrases: Phrase[] = [
     note: "pt-PT uses 'estar a + infinitive' for the present continuous, not 'estar -ndo' like pt-BR.",
   },
   {
-    pt: "Tenho três filhos. Ficaram em casa.",
-    en: "I have three kids. They stayed home.",
+    pt: "Tenho três filhos: duas raparigas e um rapaz. Ficaram em casa com os avós.",
+    en: "I have three kids: two girls and a boy. They stayed home with their grandparents.",
+    note: "'Rapaz' / 'rapariga' (boy / girl) in pt-PT. CAREFUL: 'rapariga' means a young woman in pt-PT but is a slur in some pt-BR contexts — only use in Portugal.",
+  },
+  {
+    pt: "Têm quinze, treze, e onze anos.",
+    en: "They're 15, 13, and 11 years old.",
+  },
+  {
+    pt: "Somos do Indiana, no centro-oeste dos Estados Unidos.",
+    en: "We're from Indiana, in the US Midwest.",
+    note: "Most Portuguese will know New York or California — Indiana usually needs context.",
   },
   {
     pt: "Sou engenheiro de inteligência artificial.",
@@ -48,9 +58,18 @@ export const smalltalkPhrases: Phrase[] = [
     en: "I love Portugal!",
   },
   {
+    pt: "Também falo espanhol. Se eu não perceber, posso dizer em espanhol?",
+    en: "I also speak Spanish. If I don't understand, can I say it in Spanish?",
+    note: "Many Portuguese understand Spanish. Useful escape hatch.",
+  },
+  {
+    pt: "Em espanhol diz-se [X], como é em português?",
+    en: "In Spanish you say [X], how do you say it in Portuguese?",
+    note: "Replace [X] with the Spanish word. Great for genuinely learning.",
+  },
+  {
     pt: "Pode falar mais devagar, se faz favor?",
     en: "Could you speak more slowly, please?",
-    note: "Useful escape hatch for anything you didn't catch.",
   },
   {
     pt: "Desculpe, não percebi.",

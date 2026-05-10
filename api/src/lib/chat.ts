@@ -81,6 +81,9 @@ export const KNOWN_MOCK_SCENARIOS = [
   "sintra",
   "fortaleza",
   "winery",
+  "lisboa",
+  "beach",
+  "lost",
 ] as const;
 
 export function mockBankFor(scenarioId: string): MockBank {
@@ -203,6 +206,36 @@ export function mockBankFor(scenarioId: string): MockBank {
           { pt: "Este tinto é da casta Castelão, envelhecido seis meses em carvalho.", en: "This red is from the Castelão grape, aged six months in oak." },
           { pt: "O Moscatel de Setúbal é o nosso ex-líbris — perfeito com queijo ou sobremesa.", en: "Setúbal Moscatel is our flagship — perfect with cheese or dessert." },
           { pt: "Sim, conseguimos enviar para os Estados Unidos, mas o envio fica caro. Querem que prepare uma encomenda?", en: "Yes, we can ship to the US, but shipping is expensive. Want me to put an order together?" },
+        ],
+      };
+    case "lisboa":
+      return {
+        greeting: { pt: "Que vista, não é? É a primeira vez em Lisboa?", en: "What a view, isn't it? First time in Lisbon?" },
+        followUps: [
+          { pt: "O 28 é fixe mas vai com calma — atenção aos carteiristas.", en: "The 28 is great but be careful — watch out for pickpockets." },
+          { pt: "Pastéis de Belém só lá em Belém. Em todo o lado é 'pastel de nata'.", en: "Pastéis de Belém only at the Belém shop. Everywhere else they're 'pastel de nata'." },
+          { pt: "Para Fado autêntico, vá ao Tasca do Chico ou Mesa de Frades. Reserve!", en: "For real Fado, go to Tasca do Chico or Mesa de Frades. Book ahead!" },
+          { pt: "Compre um Viva Viagem e carregue cinco euros. Serve para tudo.", en: "Buy a Viva Viagem card and load five euros. Works for everything." },
+        ],
+      };
+    case "beach":
+      return {
+        greeting: { pt: "Bom dia! Querem espreguiçadeiras com sombra?", en: "Good morning! Want loungers with an umbrella?" },
+        followUps: [
+          { pt: "São quinze euros o dia. Pago no fim, não há problema.", en: "It's fifteen euros for the day. Pay at the end, no problem." },
+          { pt: "A bandeira está verde. Mas a água está fresca, atenção.", en: "The flag is green. But the water's chilly, fair warning." },
+          { pt: "O bar tem sandes, saladas, e cervejas geladas.", en: "The bar has sandwiches, salads, and cold beers." },
+          { pt: "As casas de banho ficam ali à direita.", en: "The toilets are over there on the right." },
+        ],
+      };
+    case "lost":
+      return {
+        greeting: { pt: "Boa tarde. Em que posso ajudar?", en: "Good afternoon. How can I help?" },
+        followUps: [
+          { pt: "Onde foi e a que horas, mais ou menos?", en: "Where was it and at what time, roughly?" },
+          { pt: "Vou abrir um auto. Vou precisar do passaporte ou de um documento de identificação.", en: "I'll open a report. I'll need your passport or an ID document." },
+          { pt: "Para o passaporte novo, vão à embaixada na Avenida das Forças Armadas. Levem este auto.", en: "For a new passport, go to the embassy on Avenida das Forças Armadas. Take this report with you." },
+          { pt: "Aqui tem a cópia. Espero que apareça. Boa viagem.", en: "Here's your copy. I hope it turns up. Safe travels." },
         ],
       };
     default:
