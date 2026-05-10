@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.vite/
+.azure/
+.env
+.env.local
+local.settings.json
+*.log
+.DS_Store
+.vscode/
+!.vscode/extensions.json

@@ -1,0 +1,21 @@
+{
+  "name": "tudo-bem-api",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/src/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "func start",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.4.5"
+  }
+}

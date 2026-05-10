@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AZURE_SPEECH_KEY": "<your-speech-key>",
+    "AZURE_SPEECH_REGION": "westeurope",
+    "AZURE_OPENAI_ENDPOINT": "https://<name>.openai.azure.com",
+    "AZURE_OPENAI_KEY": "<your-openai-key>",
+    "AZURE_OPENAI_DEPLOYMENT": "gpt-5.4-mini"
+  },
+  "Host": {
+    "CORS": "*"
+  }
+}
