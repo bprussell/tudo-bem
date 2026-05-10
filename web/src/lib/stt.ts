@@ -1,3 +1,5 @@
+import { blobToWav16kMono } from "./audio";
+
 // STT response shapes mirrored in api/src/functions/stt.ts — keep in sync (issue #9).
 export type WordScore = { word: string; accuracy: number };
 export type Pronunciation = {
@@ -13,13 +15,18 @@ export type STTReply = {
 };
 
 export async function transcribe(audio: Blob, referenceText?: string): Promise<STTReply> {
-  const audioBase64 = await blobToBase64(audio);
+  // Convert MediaRecorder output (webm/opus on Chromium, mp4/aac on Safari)
+  // into 16kHz mono PCM WAV — the format Azure Speech accepts. Skip if the
+  // recording is already WAV.
+  const wav = audio.type.includes("wav") ? audio : await blobToWav16kMono(audio);
+  const audioBase64 = await blobToBase64(wav);
   const res = await fetch("/api/stt", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       audioBase64,
-      contentType: audio.type || "audio/webm",
+      // Azure Speech REST expects this exact Content-Type for 16kHz mono PCM WAV.
+      contentType: "audio/wav; codecs=audio/pcm; samplerate=16000",
       referenceText,
     }),
   });
