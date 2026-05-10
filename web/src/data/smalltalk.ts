@@ -32,7 +32,26 @@ export const smalltalkPhrases: Phrase[] = [
   {
     pt: "Somos do Indiana, no centro-oeste dos Estados Unidos.",
     en: "We're from Indiana, in the US Midwest.",
-    note: "Most Portuguese will know New York or California — Indiana usually needs context.",
+    note: "Most Portuguese will know New York or California — Indiana usually needs context. 'Perto de Chicago' helps.",
+  },
+  {
+    pt: "Em Indiana há quatro estações bem distintas. Aqui é mais ameno o ano todo.",
+    en: "Indiana has four distinct seasons. Here it's milder year-round.",
+    note: "'Ameno' (mild) is a common Portuguese compliment about climate.",
+  },
+  {
+    pt: "Casámos há vinte anos, no Indiana. Ainda nos damos bem.",
+    en: "We got married twenty years ago in Indiana. We still get along.",
+    note: "Self-deprecating humour lands well in Portugal.",
+  },
+  {
+    pt: "Sempre quisemos vir a Portugal. Finalmente conseguimos!",
+    en: "We always wanted to come to Portugal. We finally made it!",
+  },
+  {
+    pt: "Já tenho saudades dos miúdos.",
+    en: "I already miss the kids.",
+    note: "'Miúdos' (pt-PT informal) = kids. 'Saudade' is the famous untranslatable feeling — using it correctly will charm any local.",
   },
   {
     pt: "Sou engenheiro de inteligência artificial.",
@@ -42,6 +61,16 @@ export const smalltalkPhrases: Phrase[] = [
   {
     pt: "Trabalho numa consultora de tecnologia.",
     en: "I work at a tech consulting firm.",
+  },
+  {
+    pt: "Construo aplicações com modelos de linguagem grandes, como o ChatGPT.",
+    en: "I build applications with large language models, like ChatGPT.",
+    note: "'Modelo de linguagem grande' = LLM. 'Aplicação' (pt-PT) = app/application.",
+  },
+  {
+    pt: "Esta aplicação que estou a usar — fui eu que a fiz, para esta viagem.",
+    en: "This app I'm using — I built it, for this trip.",
+    note: "Conversation gold. Personal projects + AI engineer = curious questions.",
   },
   {
     pt: "Estou a aprender português há cerca de seis meses.",
@@ -54,8 +83,42 @@ export const smalltalkPhrases: Phrase[] = [
     note: "'Aplicação' (pt-PT) for app; 'aplicativo' is more pt-BR.",
   },
   {
+    pt: "O sotaque do português europeu é difícil, mas estou a melhorar.",
+    en: "The European Portuguese accent is hard, but I'm getting better.",
+    note: "'Sotaque' = accent. EP famously swallows unstressed vowels — locals know it's the hard part.",
+  },
+  {
+    pt: "Adoro como vocês dizem 'pois pois' em conversa.",
+    en: "I love how you say 'pois pois' in conversation.",
+    note: "'Pois' is a uniquely Portuguese conversational particle — like 'right', 'yeah', 'I see'. Doubling it adds emphasis.",
+  },
+  {
+    pt: "Falo espanhol há oito anos no Duolingo, então parece familiar — mas é mesmo diferente!",
+    en: "I've been doing Spanish on Duolingo for eight years, so it feels familiar — but it really is different!",
+    note: "'Há oito anos' = for eight years (note: 'há' for past duration, 'desde' for a starting point).",
+  },
+  {
     pt: "Adoro Portugal!",
     en: "I love Portugal!",
+  },
+  {
+    pt: "Há quanto tempo vive aqui?",
+    en: "How long have you lived here?",
+    note: "Reciprocity — small talk is two-way. Locals love being asked about their own life.",
+  },
+  {
+    pt: "Qual é o seu prato português favorito?",
+    en: "What's your favourite Portuguese dish?",
+    note: "Reliable conversation-opener with anyone Portuguese.",
+  },
+  {
+    pt: "Recomenda alguma coisa para fazer numa noite em Lisboa?",
+    en: "Any recommendation for an evening in Lisbon?",
+  },
+  {
+    pt: "É a única coisa que vamos sentir falta — esta comida!",
+    en: "It'll be the one thing we'll miss — this food!",
+    note: "'Sentir falta' = to miss (more pt-BR-flavoured but used in pt-PT too); 'ter saudades' is more characteristically pt-PT.",
   },
   {
     pt: "Também falo espanhol. Se eu não perceber, posso dizer em espanhol?",

@@ -14,6 +14,7 @@ import { wineryPhrases } from "./winery";
 import { lisboaPhrases } from "./lisboa";
 import { beachPhrases } from "./beach";
 import { lostPhrases } from "./lost";
+import { photoPhrases } from "./photo";
 
 export const SCENARIOS: Scenario[] = [
   // Trip-specific scenarios — see api/src/userContext.ts for the personal
@@ -57,6 +58,14 @@ export const SCENARIOS: Scenario[] = [
     emoji: "🥂",
     blurb: "Anniversary dinner, fine-dining etiquette, tasting menu.",
     phrases: fortalezaPhrases,
+  },
+  {
+    id: "photo",
+    title: "Anniversary photo",
+    titlePt: "Pedir uma fotografia",
+    emoji: "📸",
+    blurb: "Asking a stranger to take your photo at a viewpoint or landmark.",
+    phrases: photoPhrases,
   },
   {
     id: "winery",

@@ -84,6 +84,7 @@ export const KNOWN_MOCK_SCENARIOS = [
   "lisboa",
   "beach",
   "lost",
+  "photo",
 ] as const;
 
 export function mockBankFor(scenarioId: string): MockBank {
@@ -236,6 +237,16 @@ export function mockBankFor(scenarioId: string): MockBank {
           { pt: "Vou abrir um auto. Vou precisar do passaporte ou de um documento de identificação.", en: "I'll open a report. I'll need your passport or an ID document." },
           { pt: "Para o passaporte novo, vão à embaixada na Avenida das Forças Armadas. Levem este auto.", en: "For a new passport, go to the embassy on Avenida das Forças Armadas. Take this report with you." },
           { pt: "Aqui tem a cópia. Espero que apareça. Boa viagem.", en: "Here's your copy. I hope it turns up. Safe travels." },
+        ],
+      };
+    case "photo":
+      return {
+        greeting: { pt: "Claro, com todo o gosto! Querem com o castelo atrás?", en: "Of course, happy to! Want it with the castle behind you?" },
+        followUps: [
+          { pt: "Junte-se mais um bocadinho. Sorriam!", en: "Get a bit closer together. Smile!" },
+          { pt: "Olho! Pronto, tirei duas — vejam se gostam.", en: "Cheese! There, I took two — see if you like them." },
+          { pt: "Vinte anos de casados, parabéns! Tiro mais uma com o mar ao fundo.", en: "Twenty years married, congratulations! I'll take another with the sea behind." },
+          { pt: "Querem que eu vos tire também com o vosso telemóvel? Boa viagem!", en: "Want me to take some on your phone too? Have a great trip!" },
         ],
       };
     default:
