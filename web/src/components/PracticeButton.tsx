@@ -7,26 +7,33 @@ type Props = {
 };
 
 export function PracticeButton({ referenceText }: Props) {
-  const recorder = useRecorder();
   const [transcribing, setTranscribing] = useState(false);
   const [result, setResult] = useState<STTReply | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const recorder = useRecorder({
+    onComplete: (blob) => {
+      void scoreBlob(blob);
+    },
+  });
+
+  async function scoreBlob(blob: Blob) {
+    setTranscribing(true);
+    setError(null);
+    try {
+      const reply = await transcribe(blob, referenceText);
+      setResult(reply);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setTranscribing(false);
+    }
+  }
+
   async function toggle() {
     if (transcribing) return;
     if (recorder.state === "recording") {
-      const blob = await recorder.stop();
-      if (!blob) return;
-      setTranscribing(true);
-      setError(null);
-      try {
-        const reply = await transcribe(blob, referenceText);
-        setResult(reply);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
-      } finally {
-        setTranscribing(false);
-      }
+      recorder.stop();
       return;
     }
     setError(null);
