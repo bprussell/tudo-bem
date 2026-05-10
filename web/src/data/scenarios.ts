@@ -5,8 +5,66 @@ import { taxiPhrases } from "./taxi";
 import { hotelPhrases } from "./hotel";
 import { directionsPhrases } from "./directions";
 import { pharmacyPhrases } from "./pharmacy";
+import { smalltalkPhrases } from "./smalltalk";
+import { boltPhrases } from "./bolt";
+import { airbnbPhrases } from "./airbnb";
+import { sintraPhrases } from "./sintra";
+import { fortalezaPhrases } from "./fortaleza";
+import { wineryPhrases } from "./winery";
 
 export const SCENARIOS: Scenario[] = [
+  // Trip-specific scenarios — see api/src/userContext.ts for the personal
+  // context the personas reference.
+  {
+    id: "smalltalk",
+    title: "Small talk",
+    titlePt: "Conversa de circunstância",
+    emoji: "💬",
+    blurb: "Introduce yourself, work, family, your Portuguese journey, the trip.",
+    phrases: smalltalkPhrases,
+  },
+  {
+    id: "bolt",
+    title: "Bolt ride",
+    titlePt: "De Bolt",
+    emoji: "🚗",
+    blurb: "Airport to Estoril, around Cascais and Lisbon. Cashless small talk.",
+    phrases: boltPhrases,
+  },
+  {
+    id: "airbnb",
+    title: "Airbnb check-in",
+    titlePt: "Chegada ao Airbnb",
+    emoji: "🏡",
+    blurb: "Meeting the host in Estoril; keys, Wi-Fi, recommendations.",
+    phrases: airbnbPhrases,
+  },
+  {
+    id: "sintra",
+    title: "Sintra palaces",
+    titlePt: "Sintra",
+    emoji: "🏰",
+    blurb: "Tickets at Pena, the Moors' Castle, and Sintra-village treats.",
+    phrases: sintraPhrases,
+  },
+  {
+    id: "fortaleza",
+    title: "Fortaleza do Guincho",
+    titlePt: "Fortaleza do Guincho",
+    emoji: "🥂",
+    blurb: "Anniversary dinner, fine-dining etiquette, tasting menu.",
+    phrases: fortalezaPhrases,
+  },
+  {
+    id: "winery",
+    title: "Winery tasting",
+    titlePt: "Prova numa adega",
+    emoji: "🍷",
+    blurb: "Wine vocab, grape varieties, shipping bottles home.",
+    phrases: wineryPhrases,
+  },
+
+  // Generic everyday scenarios
   {
     id: "cafe",
     title: "Café",
