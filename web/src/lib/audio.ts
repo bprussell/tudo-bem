@@ -49,7 +49,7 @@ function mixToMono(buffer: AudioBuffer): Float32Array {
   return out;
 }
 
-function linearResample(input: Float32Array, fromRate: number, toRate: number): Float32Array {
+export function linearResample(input: Float32Array, fromRate: number, toRate: number): Float32Array {
   if (fromRate === toRate) return input;
   const ratio = fromRate / toRate;
   const outLength = Math.floor(input.length / ratio);
@@ -64,7 +64,7 @@ function linearResample(input: Float32Array, fromRate: number, toRate: number): 
   return out;
 }
 
-function encodeWav(samples: Float32Array, sampleRate: number): Blob {
+export function encodeWav(samples: Float32Array, sampleRate: number): Blob {
   const numChannels = 1;
   const bitsPerSample = 16;
   const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;

@@ -42,3 +42,5 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Build (tsc + vite)
         run: npm run build
+      - name: Test (vitest)
+        run: npm test
