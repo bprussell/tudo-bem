@@ -60,6 +60,7 @@ export function Scenario({ scenarioId, voice, showTranslation, handsFree }: Prop
           phrases={scenario.phrases}
           voice={voice}
           showTranslation={showTranslation}
+          scenarioContext={scenario.title}
         />
       ) : (
         <ChatView

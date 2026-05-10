@@ -4,6 +4,7 @@ import { clearChatTurns, loadChatTurns, saveChatTurns } from "../lib/chatStorage
 import { transcribe } from "../lib/stt";
 import { fetchTtsAudio, type Voice } from "../lib/tts";
 import { useRecorder } from "../hooks/useRecorder";
+import { useExplain } from "../contexts/ExplainContext";
 import { TtsButtons } from "./TtsButtons";
 
 type TutorTurn = { role: "tutor"; reply: ChatReply };
@@ -326,12 +327,20 @@ function TutorBubble({
   voice: Voice;
   showTranslation: boolean;
 }) {
+  const explain = useExplain();
   return (
     <div className={`bubble tutor${reply.mock ? " mock" : ""}`}>
       <div className="pt">{reply.reply_pt}</div>
       {showTranslation && <div className="en">{reply.reply_en}</div>}
       {reply.tip && <div className="note">💡 {reply.tip}</div>}
       <TtsButtons text={reply.reply_pt} voice={voice} />
+      <button
+        type="button"
+        className="link-button ask-link"
+        onClick={() => explain.open({ pt: reply.reply_pt, en: reply.reply_en })}
+      >
+        💡 Ask about this
+      </button>
     </div>
   );
 }

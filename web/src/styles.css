@@ -378,6 +378,152 @@ h1 {
 .link-button:hover {
   color: var(--text);
 }
+.ask-link {
+  margin-top: 0.5rem;
+}
+
+/* Explain sidebar (overlay sheet) */
+.explain-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 100;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+  animation: fade-in 0.15s ease-out;
+}
+.explain-sheet {
+  background: var(--bg);
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--surface-2);
+  animation: slide-in 0.2s ease-out;
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slide-in {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.explain-header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--surface-2);
+  background: var(--surface);
+}
+.explain-topic {
+  flex: 1;
+  min-width: 0;
+}
+.explain-topic .label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.explain-topic .pt {
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin-top: 0.15rem;
+}
+.explain-topic .en {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+}
+.close-button {
+  background: var(--surface-2);
+  color: var(--text);
+  border: none;
+  border-radius: 8px;
+  width: 2.2rem;
+  height: 2.2rem;
+  cursor: pointer;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.close-button:hover {
+  background: var(--surface-3);
+}
+
+.explain-stream {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.explain-empty {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.explain-suggestions {
+  margin-top: 0.5rem;
+  padding-left: 1.2rem;
+}
+.explain-suggestions li {
+  margin: 0.3rem 0;
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.85rem;
+}
+.explain-stream .bubble {
+  max-width: 92%;
+}
+.explain-stream .bubble.tutor p {
+  margin: 0 0 0.4rem 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+.explain-stream .bubble.tutor p:last-child {
+  margin-bottom: 0;
+}
+
+.explain-input {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--surface-2);
+  background: var(--surface);
+}
+.explain-input textarea {
+  flex: 1;
+  resize: none;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+.explain-input textarea:focus {
+  outline: none;
+  border-color: var(--accent-dim);
+}
+.explain-input button {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-end;
+}
+.explain-input button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 .chat-input {
   display: flex;

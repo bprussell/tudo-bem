@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Home } from "./routes/Home";
 import { Scenario } from "./routes/Scenario";
 import { Favorites } from "./routes/Favorites";
 import { useHashRoute } from "./hooks/useHashRoute";
 import { loadSettings, saveSettings, type Settings } from "./lib/settings";
 import type { Voice } from "./lib/tts";
+import { ExplainContext } from "./contexts/ExplainContext";
+import { ExplainSidebar } from "./components/ExplainSidebar";
+import type { ExplainTopic } from "./lib/explain";
 
 const VOICES: { id: Voice; label: string }[] = [
   { id: "pt-PT-RaquelNeural", label: "Raquel (f)" },
@@ -16,6 +19,7 @@ export function App() {
   const hash = useHashRoute();
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const isFirstSettingsRender = useRef(true);
+  const [explainTopic, setExplainTopic] = useState<ExplainTopic | null>(null);
 
   useEffect(() => {
     if (isFirstSettingsRender.current) {
@@ -25,12 +29,18 @@ export function App() {
     saveSettings(settings);
   }, [settings]);
 
+  const openExplain = useCallback((topic: ExplainTopic) => {
+    setExplainTopic(topic);
+  }, []);
+  const closeExplain = useCallback(() => setExplainTopic(null), []);
+
   const path = hash.replace(/^#/, "").replace(/\?.*$/, "").replace(/\/$/, "");
   const scenarioMatch = path.match(/^\/([a-z-]+)$/);
   const isHome = path === "" || path === "/";
   const isFavorites = path === "/favorites";
 
   return (
+    <ExplainContext.Provider value={{ open: openExplain }}>
     <main>
       <SettingsBar settings={settings} onChange={setSettings} />
       {isHome ? (
@@ -57,6 +67,8 @@ export function App() {
         <p>See PLAN.md for roadmap · pt-PT only</p>
       </footer>
     </main>
+    {explainTopic && <ExplainSidebar topic={explainTopic} onClose={closeExplain} />}
+    </ExplainContext.Provider>
   );
 }
 

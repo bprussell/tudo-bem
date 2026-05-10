@@ -3,6 +3,7 @@ import { SCENARIOS } from "../data/scenarios";
 import type { Phrase, Scenario } from "../data/types";
 import type { Voice } from "../lib/tts";
 import { getAllFavorites } from "../lib/favorites";
+import { useExplain } from "../contexts/ExplainContext";
 import { TtsButtons } from "../components/TtsButtons";
 import { PracticeButton } from "../components/PracticeButton";
 import { StarButton } from "../components/StarButton";
@@ -15,6 +16,7 @@ type Props = {
 type Item = { scenario: Scenario; phrase: Phrase };
 
 export function Favorites({ voice, showTranslation }: Props) {
+  const explain = useExplain();
   const items = useMemo<Item[]>(() => {
     const set = getAllFavorites();
     if (set.size === 0) return [];
@@ -61,6 +63,13 @@ export function Favorites({ voice, showTranslation }: Props) {
               </div>
               <TtsButtons text={phrase.pt} voice={voice} />
               <PracticeButton referenceText={phrase.pt} />
+              <button
+                type="button"
+                className="link-button ask-link"
+                onClick={() => explain.open({ pt: phrase.pt, en: phrase.en, context: scenario.title })}
+              >
+                💡 Ask about this
+              </button>
             </li>
           ))}
         </ol>
