@@ -1,10 +1,13 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 import { ALLOWED_VOICES, buildSsml, isValidRate, type Rate } from "../lib/ssml";
+import { isAuthorized, unauthorizedResponse } from "../lib/auth";
 
 export async function tts(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
+  if (!isAuthorized(request)) return unauthorizedResponse();
+
   const key = process.env.AZURE_SPEECH_KEY;
   const region = process.env.AZURE_SPEECH_REGION;
   if (!key || !region) {

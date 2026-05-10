@@ -1,4 +1,5 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
+import { isAuthorized, unauthorizedResponse } from "../lib/auth";
 
 type STTRequest = {
   audioBase64: string;
@@ -27,6 +28,8 @@ export async function stt(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
+  if (!isAuthorized(request)) return unauthorizedResponse();
+
   let body: STTRequest;
   try {
     body = (await request.json()) as STTRequest;
