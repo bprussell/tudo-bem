@@ -1,36 +1,5 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
-
-type Rate = "normal" | "slow" | "slower";
-
-const RATE_TO_PROSODY: Record<Rate, string | null> = {
-  normal: null,
-  slow: "-25%",
-  slower: "-40%",
-};
-
-const ALLOWED_VOICES = new Set([
-  "pt-PT-RaquelNeural",
-  "pt-PT-DuarteNeural",
-  "pt-PT-FernandaNeural",
-]);
-
-function escapeForSsml(input: string): string {
-  return input
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
-
-function buildSsml(text: string, voice: string, rate: Rate): string {
-  const safe = escapeForSsml(text);
-  const prosody = RATE_TO_PROSODY[rate];
-  const inner = prosody
-    ? `<prosody rate="${prosody}">${safe}</prosody>`
-    : safe;
-  return `<speak version="1.0" xml:lang="pt-PT"><voice name="${voice}">${inner}</voice></speak>`;
-}
+import { ALLOWED_VOICES, buildSsml, isValidRate, type Rate } from "../lib/ssml";
 
 export async function tts(
   request: HttpRequest,
@@ -44,7 +13,7 @@ export async function tts(
 
   const body = request.method === "POST" ? ((await request.json()) as Record<string, unknown>) : {};
   const text = String(body.text ?? request.query.get("text") ?? "").trim();
-  const rateParam = String(body.rate ?? request.query.get("rate") ?? "normal") as Rate;
+  const rateParam = String(body.rate ?? request.query.get("rate") ?? "normal");
   const voiceParam = String(body.voice ?? request.query.get("voice") ?? "pt-PT-RaquelNeural");
 
   if (!text) {
@@ -53,14 +22,14 @@ export async function tts(
   if (text.length > 1000) {
     return { status: 400, jsonBody: { error: "text exceeds 1000 chars" } };
   }
-  if (!(rateParam in RATE_TO_PROSODY)) {
+  if (!isValidRate(rateParam)) {
     return { status: 400, jsonBody: { error: "rate must be normal|slow|slower" } };
   }
   if (!ALLOWED_VOICES.has(voiceParam)) {
     return { status: 400, jsonBody: { error: "unsupported voice" } };
   }
 
-  const ssml = buildSsml(text, voiceParam, rateParam);
+  const ssml = buildSsml(text, voiceParam, rateParam as Rate);
   const url = `https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`;
 
   const upstream = await fetch(url, {
