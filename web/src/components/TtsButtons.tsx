@@ -29,6 +29,11 @@ export function TtsButtons({ text, voice }: Props) {
       audioRef.current.src = url;
       await audioRef.current.play();
     } catch (e) {
+      // Safari's HTMLAudioElement.play() rejects with AbortError when a
+      // newer .src= load supersedes the previous one. That's not a real
+      // error from the user's perspective — it's the prior playback
+      // being cancelled. Swallow it.
+      if (e instanceof Error && e.name === "AbortError") return;
       setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(null);
