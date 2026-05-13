@@ -1,0 +1,54 @@
+import { useEffect, useRef, useState } from "react";
+import { fetchTtsAudio, type Rate, type Voice } from "../lib/tts";
+
+type Props = {
+  text: string;
+  voice: Voice;
+};
+
+export function TtsButtons({ text, voice }: Props) {
+  const [loading, setLoading] = useState<Rate | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const lastUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (lastUrlRef.current) URL.revokeObjectURL(lastUrlRef.current);
+    };
+  }, []);
+
+  async function play(rate: Rate) {
+    setError(null);
+    setLoading(rate);
+    try {
+      const url = await fetchTtsAudio(text, rate, voice);
+      if (lastUrlRef.current) URL.revokeObjectURL(lastUrlRef.current);
+      lastUrlRef.current = url;
+      if (!audioRef.current) audioRef.current = new Audio();
+      audioRef.current.src = url;
+      await audioRef.current.play();
+    } catch (e) {
+      // Safari's HTMLAudioElement.play() rejects with AbortError when a
+      // newer .src= load supersedes the previous one. That's not a real
+      // error from the user's perspective — it's the prior playback
+      // being cancelled. Swallow it.
+      if (e instanceof Error && e.name === "AbortError") return;
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  return (
+    <div className="tts-buttons">
+      <button onClick={() => play("normal")} disabled={loading !== null}>
+        {loading === "normal" ? "…" : "▶ Normal"}
+      </button>
+      <button onClick={() => play("slow")} disabled={loading !== null}>
+        {loading === "slow" ? "…" : "▶ Slow"}
+      </button>
+      {error && <span className="tts-error">{error}</span>}
+    </div>
+  );
+}

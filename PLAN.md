@@ -25,7 +25,7 @@ is a hard requirement; voice input is a Phase 2 nice-to-have.
 | Frontend | React + Vite + TypeScript, PWA | Installable on phone, offline shell. |
 | Backend | Azure Functions (TypeScript, v4 programming model) | Single language across stack. |
 | Hosting | Azure Static Web Apps Free tier | Includes managed Functions. ~$0/mo. |
-| LLM | Azure OpenAI **GPT-5.4-mini** | Cheap, fast, multilingual; ~$0.75 in / $4.50 out per 1M tokens. |
+| LLM | Azure OpenAI cheap multilingual model (target: **GPT-5.4-mini**) | Cheap, fast, multilingual; ~$0.75 in / $4.50 out per 1M tokens per third-party trackers. **Verify the exact deployment name in Azure portal before provisioning** — official Azure pricing pages rendered as `$-` placeholders during research and the model name came from a Microsoft Q&A thread. The deployment name is configurable via `AZURE_OPENAI_DEPLOYMENT`, so swapping models is a one-env-var change. |
 | TTS | Azure Speech Service neural voices | `pt-PT-RaquelNeural`, `pt-PT-DuarteNeural`, `pt-PT-FernandaNeural`. |
 | STT (Phase 2) | Azure Speech Service + pronunciation assessment | pt-PT supported (no prosody score, but phoneme/word-level). |
 
@@ -62,32 +62,38 @@ The `/api/tts` endpoint accepts `?rate=normal|slow` and builds SSML:
 
 ## Milestones
 
-### M1 — TTS demo (this commit)
+### M1 — TTS demo (shipped)
 - [x] Repo scaffold, plan doc, README
 - [x] `/api/tts` endpoint hitting Azure Speech REST API
-- [x] Minimal React UI: pick a phrase from a café list, play normal/slow
-- [ ] Provision Azure Speech + Static Web App, deploy
-- [ ] Verify pronunciation on phone
+- [x] React UI: phrase list with normal/slow TTS playback per phrase
+- [x] Voice picker (Raquel / Duarte / Fernanda), translation toggle, persisted to localStorage
 
-### M2 — Conversational tutor
-- [ ] `/api/chat` endpoint (Azure OpenAI GPT-5.4-mini)
-- [ ] System prompt: Lisbon café server, pt-PT only, travel-appropriate vocab
-- [ ] Multi-turn UI with translation toggle per line
-- [ ] Auto-TTS on each tutor reply
+### M2 — Conversational tutor (shipped, mocked)
+- [x] `/api/chat` endpoint (Azure OpenAI Chat Completions, JSON-formatted reply)
+- [x] System prompts per scenario: Lisbon-area pt-PT, travel-appropriate vocab, pt-BR words explicitly forbidden
+- [x] Multi-turn chat UI with translation toggle per tutor line
+- [x] TTS buttons (normal/slow) on each tutor reply
+- [x] `MOCK_MODE` for testing the full UX without Azure provisioning
 
 ### M3 — Voice input + scoring
 - [ ] Browser mic capture → `/api/stt` (Azure Speech STT)
 - [ ] Pronunciation assessment scores rendered per word
 - [ ] Hands-free conversation mode
 
-### M4 — Scenario library
-- [ ] Café (M1/M2 baseline)
-- [ ] Restaurant
-- [ ] Taxi / Uber
-- [ ] Hotel check-in
-- [ ] Asking for directions
-- [ ] Pharmacy
-- [ ] Each scenario: warm-up vocab, role-play, debrief
+### M4 — Scenario library (shipped)
+- [x] Café
+- [x] Restaurant
+- [x] Taxi
+- [x] Hotel check-in
+- [x] Asking for directions
+- [x] Pharmacy
+- [ ] Each scenario: warm-up vocab, role-play, debrief (stretch)
+
+### Before first deploy
+- [x] Auth wired (`staticwebapp.config.json` + `api/src/lib/auth.ts`, GitHub OAuth + per-user allowlist) — needs OAuth app registration + SWA application settings, see [DEPLOY.md](./DEPLOY.md) §7
+- [x] Lockfiles committed
+- [ ] Replace placeholder PWA icons in `web/public/` with a real design
+- [ ] Verify the chosen Azure OpenAI model name and pricing in the Azure portal (see LLM row in the tech-choice table above)
 
 ## Cost estimate
 

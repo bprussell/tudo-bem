@@ -1,6 +1,13 @@
-import { useEffect, useRef, useState } from "react";
-import { cafePhrases } from "./data/cafe";
-import { fetchTtsAudio, type Rate, type Voice } from "./lib/tts";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Home } from "./routes/Home";
+import { Scenario } from "./routes/Scenario";
+import { Favorites } from "./routes/Favorites";
+import { useHashRoute } from "./hooks/useHashRoute";
+import { loadSettings, saveSettings, type Settings } from "./lib/settings";
+import type { Voice } from "./lib/tts";
+import { ExplainContext } from "./contexts/ExplainContext";
+import { ExplainSidebar } from "./components/ExplainSidebar";
+import type { ExplainTopic } from "./lib/explain";
 
 const VOICES: { id: Voice; label: string }[] = [
   { id: "pt-PT-RaquelNeural", label: "Raquel (f)" },
@@ -9,95 +16,98 @@ const VOICES: { id: Voice; label: string }[] = [
 ];
 
 export function App() {
-  const [voice, setVoice] = useState<Voice>("pt-PT-RaquelNeural");
-  const [showTranslation, setShowTranslation] = useState(true);
-  const [loadingKey, setLoadingKey] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const lastUrlRef = useRef<string | null>(null);
+  const hash = useHashRoute();
+  const [settings, setSettings] = useState<Settings>(() => loadSettings());
+  const isFirstSettingsRender = useRef(true);
+  const [explainTopic, setExplainTopic] = useState<ExplainTopic | null>(null);
 
   useEffect(() => {
-    return () => {
-      if (lastUrlRef.current) URL.revokeObjectURL(lastUrlRef.current);
-    };
-  }, []);
-
-  async function play(text: string, rate: Rate, key: string) {
-    setError(null);
-    setLoadingKey(key);
-    try {
-      const url = await fetchTtsAudio(text, rate, voice);
-      if (lastUrlRef.current) URL.revokeObjectURL(lastUrlRef.current);
-      lastUrlRef.current = url;
-      if (!audioRef.current) audioRef.current = new Audio();
-      audioRef.current.src = url;
-      await audioRef.current.play();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setLoadingKey(null);
+    if (isFirstSettingsRender.current) {
+      isFirstSettingsRender.current = false;
+      return;
     }
-  }
+    saveSettings(settings);
+  }, [settings]);
+
+  const openExplain = useCallback((topic: ExplainTopic) => {
+    setExplainTopic(topic);
+  }, []);
+  const closeExplain = useCallback(() => setExplainTopic(null), []);
+
+  const path = hash.replace(/^#/, "").replace(/\?.*$/, "").replace(/\/$/, "");
+  const scenarioMatch = path.match(/^\/([a-z-]+)$/);
+  const isHome = path === "" || path === "/";
+  const isFavorites = path === "/favorites";
 
   return (
+    <ExplainContext.Provider value={{ open: openExplain }}>
     <main>
-      <header>
-        <h1>Tudo Bem</h1>
-        <p className="tag">European Portuguese — café scenario</p>
-      </header>
-
-      <section className="controls">
-        <label>
-          Voice:
-          <select value={voice} onChange={(e) => setVoice(e.target.value as Voice)}>
-            {VOICES.map((v) => (
-              <option key={v.id} value={v.id}>{v.label}</option>
-            ))}
-          </select>
-        </label>
-        <label className="toggle">
-          <input
-            type="checkbox"
-            checked={showTranslation}
-            onChange={(e) => setShowTranslation(e.target.checked)}
-          />
-          Show English
-        </label>
-      </section>
-
-      {error && <div className="error">{error}</div>}
-
-      <ol className="phrases">
-        {cafePhrases.map((p, i) => {
-          const normalKey = `${i}-normal`;
-          const slowKey = `${i}-slow`;
-          return (
-            <li key={i}>
-              <div className="pt">{p.pt}</div>
-              {showTranslation && <div className="en">{p.en}</div>}
-              {p.note && <div className="note">{p.note}</div>}
-              <div className="actions">
-                <button
-                  onClick={() => play(p.pt, "normal", normalKey)}
-                  disabled={loadingKey !== null}
-                >
-                  {loadingKey === normalKey ? "…" : "▶ Normal"}
-                </button>
-                <button
-                  onClick={() => play(p.pt, "slow", slowKey)}
-                  disabled={loadingKey !== null}
-                >
-                  {loadingKey === slowKey ? "…" : "▶ Slow"}
-                </button>
-              </div>
-            </li>
-          );
-        })}
-      </ol>
-
+      <SettingsBar settings={settings} onChange={setSettings} />
+      {isHome ? (
+        <Home />
+      ) : isFavorites ? (
+        <Favorites
+          voice={settings.voice}
+          showTranslation={settings.showTranslation}
+        />
+      ) : scenarioMatch ? (
+        <Scenario
+          scenarioId={scenarioMatch[1]}
+          voice={settings.voice}
+          showTranslation={settings.showTranslation}
+          handsFree={settings.handsFree}
+        />
+      ) : (
+        <div className="missing">
+          <p>Page not found.</p>
+          <a href="#/">← Home</a>
+        </div>
+      )}
       <footer>
-        <p>M1 demo · TTS only · see PLAN.md for roadmap</p>
+        <p>See PLAN.md for roadmap · pt-PT only</p>
       </footer>
     </main>
+    {explainTopic && <ExplainSidebar topic={explainTopic} onClose={closeExplain} />}
+    </ExplainContext.Provider>
+  );
+}
+
+function SettingsBar({
+  settings,
+  onChange,
+}: {
+  settings: Settings;
+  onChange: (s: Settings) => void;
+}) {
+  return (
+    <div className="settings-bar">
+      <label>
+        Voice
+        <select
+          value={settings.voice}
+          onChange={(e) => onChange({ ...settings, voice: e.target.value as Voice })}
+        >
+          {VOICES.map((v) => (
+            <option key={v.id} value={v.id}>{v.label}</option>
+          ))}
+        </select>
+      </label>
+      <label className="toggle">
+        <input
+          type="checkbox"
+          checked={settings.showTranslation}
+          onChange={(e) => onChange({ ...settings, showTranslation: e.target.checked })}
+        />
+        EN
+      </label>
+      <label className="toggle" title="Auto-play tutor replies and (in chat) auto-record after they finish.">
+        <input
+          type="checkbox"
+          checked={settings.handsFree}
+          onChange={(e) => onChange({ ...settings, handsFree: e.target.checked })}
+        />
+        Hands-free
+      </label>
+    </div>
   );
 }
