@@ -89,17 +89,11 @@ The `/api/tts` endpoint accepts `?rate=normal|slow` and builds SSML:
 - [x] Pharmacy
 - [ ] Each scenario: warm-up vocab, role-play, debrief (stretch)
 
-### Before first public deploy
+### Before first deploy
+- [x] Auth wired (`staticwebapp.config.json` + `api/src/lib/auth.ts`, GitHub OAuth + per-user allowlist) — needs OAuth app registration + SWA application settings, see [DEPLOY.md](./DEPLOY.md) §7
+- [x] Lockfiles committed
 - [ ] Replace placeholder PWA icons in `web/public/` with a real design
-- [ ] Run `npm install` in `api/` and `web/` and commit `package-lock.json` files (SWA's Oryx builder defaults to `npm ci`, which fails without them)
 - [ ] Verify the chosen Azure OpenAI model name and pricing in the Azure portal (see LLM row in the tech-choice table above)
-- [ ] Add auth / rate limiting on `/api/*` routes — e.g. require `authenticated` role via `staticwebapp.config.json`:
-  ```json
-  "routes": [
-    { "route": "/api/*", "allowedRoles": ["authenticated"] }
-  ]
-  ```
-  and configure a SWA auth provider (GitHub or AAD). Without this, anyone with the URL can run up your Azure bill.
 
 ## Cost estimate
 

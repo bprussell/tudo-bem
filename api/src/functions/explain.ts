@@ -6,6 +6,7 @@ import {
   validateExplainRequest,
   type ExplainReply,
 } from "../lib/explain";
+import { isAuthorized, unauthorizedResponse } from "../lib/auth";
 
 const API_VERSION = process.env.AZURE_OPENAI_API_VERSION ?? "2024-10-21";
 
@@ -13,6 +14,8 @@ export async function explain(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
+  if (!isAuthorized(request)) return unauthorizedResponse();
+
   let raw: unknown;
   try {
     raw = await request.json();

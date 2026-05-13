@@ -7,6 +7,7 @@ export type RecorderOptions = {
   silenceTimeoutMs?: number;
   silenceThresholdRms?: number;
   speechThresholdRms?: number;
+  noSpeechTimeoutMs?: number;
 };
 
 export type StartOptions = {
@@ -17,6 +18,7 @@ const MAX_RECORDING_MS = 60_000;
 const DEFAULT_SILENCE_TIMEOUT_MS = 1500;
 const DEFAULT_SILENCE_THRESHOLD = 0.015;
 const DEFAULT_SPEECH_THRESHOLD = 0.04;
+const DEFAULT_NO_SPEECH_TIMEOUT_MS = 8_000;
 
 export function useRecorder(options: RecorderOptions = {}) {
   const [state, setState] = useState<RecorderState>("idle");
@@ -29,6 +31,9 @@ export function useRecorder(options: RecorderOptions = {}) {
   const rafRef = useRef<number | null>(null);
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  // When VAD's no-speech timeout fires we want to stop without firing
+  // onComplete (no audio worth transcribing) and surface a friendly message.
+  const suppressOnCompleteRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -54,6 +59,7 @@ export function useRecorder(options: RecorderOptions = {}) {
     const silenceTimeoutMs = opts.silenceTimeoutMs ?? DEFAULT_SILENCE_TIMEOUT_MS;
     const silenceThreshold = opts.silenceThresholdRms ?? DEFAULT_SILENCE_THRESHOLD;
     const speechThreshold = opts.speechThresholdRms ?? DEFAULT_SPEECH_THRESHOLD;
+    const noSpeechTimeoutMs = opts.noSpeechTimeoutMs ?? DEFAULT_NO_SPEECH_TIMEOUT_MS;
 
     const AudioCtx =
       window.AudioContext ??
@@ -68,6 +74,7 @@ export function useRecorder(options: RecorderOptions = {}) {
     source.connect(analyser);
 
     const buffer = new Uint8Array(analyser.frequencyBinCount);
+    const startedAt = performance.now();
     let speechDetected = false;
     let silenceStartedAt: number | null = null;
 
@@ -86,6 +93,16 @@ export function useRecorder(options: RecorderOptions = {}) {
       const rms = Math.sqrt(sum / buffer.length);
 
       if (rms > speechThreshold) speechDetected = true;
+
+      // Fired BEFORE speech: if nothing's detected within the no-speech
+      // window, stop and suppress onComplete (no audio worth transcribing).
+      if (!speechDetected && performance.now() - startedAt > noSpeechTimeoutMs) {
+        suppressOnCompleteRef.current = true;
+        setError("No speech detected. Tap mic to try again.");
+        recorder.stop();
+        rafRef.current = null;
+        return;
+      }
 
       if (speechDetected) {
         if (rms < silenceThreshold) {
@@ -106,6 +123,7 @@ export function useRecorder(options: RecorderOptions = {}) {
 
   async function start(startOptions?: StartOptions): Promise<void> {
     setError(null);
+    suppressOnCompleteRef.current = false;
     if (!navigator.mediaDevices?.getUserMedia) {
       setError("Microphone not supported in this browser.");
       return;
@@ -127,8 +145,10 @@ export function useRecorder(options: RecorderOptions = {}) {
         stream.getTracks().forEach((t) => t.stop());
         streamRef.current = null;
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        const suppress = suppressOnCompleteRef.current;
+        suppressOnCompleteRef.current = false;
         setState("idle");
-        if (blob.size > 0) optionsRef.current.onComplete?.(blob);
+        if (!suppress && blob.size > 0) optionsRef.current.onComplete?.(blob);
       };
       recorder.start();
       recorderRef.current = recorder;

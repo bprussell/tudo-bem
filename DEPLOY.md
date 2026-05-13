@@ -184,28 +184,50 @@ which variable wasn't picked up.
 
 ---
 
-## 7. Lock down before sharing the URL
+## 7. Auth — already wired, needs setup
 
-Right now `/api/*` is anonymous. **Anyone** with the URL can rack up your
-Azure bill. See [issue #5] — add this to `staticwebapp.config.json` and
-configure a SWA auth provider (GitHub is easiest):
+`staticwebapp.config.json` already restricts every route to the
+`authenticated` role and routes 401s to `/.auth/login/github`. The
+backend (`api/src/lib/auth.ts`) additionally checks the GitHub username
+in the SWA-injected `x-ms-client-principal` header against
+`AUTH_ALLOWED_USERS` — defense in depth. You just need to provision
+the OAuth bits and wire env vars.
 
-```json
-{
-  "navigationFallback": { ... existing ... },
-  "mimeTypes": { ... existing ... },
-  "routes": [
-    { "route": "/api/*", "allowedRoles": ["authenticated"] }
-  ],
-  "responseOverrides": {
-    "401": { "redirect": "/.auth/login/github", "statusCode": 302 }
-  }
-}
-```
+### 7a. Register a GitHub OAuth app
 
-Then in SWA → **Authentication** → enable GitHub. Test it: open the deploy
-URL in an incognito window, you should get bounced to GitHub OAuth before
-any `/api/*` call works.
+1. https://github.com/settings/developers → **OAuth Apps** → **New OAuth App**
+2. **Application name**: `tudo-bem`
+3. **Homepage URL**: your SWA deploy URL (e.g. `https://<random>.azurestaticapps.net`)
+4. **Authorization callback URL**: `<homepage>/.auth/login/github/callback`
+5. Register → on the next page, **Generate a new client secret**.
+6. Copy the **Client ID** and the **Client Secret** (the secret only shows once).
+
+### 7b. Set SWA application settings
+
+SWA resource → **Configuration** → **Application settings** → add:
+
+- `GITHUB_CLIENT_ID` = the Client ID from 7a
+- `GITHUB_CLIENT_SECRET` = the Client Secret from 7a
+- `AUTH_ALLOWED_USERS` = your GitHub username (e.g. `bprussell`).
+  Comma-separated for multiple users.
+
+> `AUTH_DISABLED` is **not** set in prod — that var is only for local dev
+> (it's pre-set in `local.settings.json.example`). If `AUTH_ALLOWED_USERS`
+> is missing in prod, the backend fails closed and every request 401s.
+> A misconfigured prod is locked, not open.
+
+### 7c. Smoke-test
+
+Open the deploy URL in an incognito window. You should:
+
+1. Get bounced to GitHub OAuth — sign in with the allowed account
+2. Land back on the app, see all 17 scenarios + favorites card
+3. Voice + chat + practice all work as in dev
+
+In a second incognito window, sign in with a different GitHub account.
+You should see a 401 from any `/api/*` call (frontend HTML still loads
+because the route restriction is "authenticated", but the backend
+allowlist rejects them — no chat, no TTS, no STT, no explain).
 
 [issue #5]: https://github.com/bprussell/tudo-bem/issues/5
 
@@ -248,3 +270,5 @@ mis-deployment). The free-tier limits on Speech kick in for the first
 | 502 from `/api/chat` with "non-JSON completion" | Model deployment doesn't support `response_format: json_object`, or the system prompt doesn't contain the literal word "JSON" — the unit test guards against the latter |
 | `npm ci` fails on Oryx build | Lockfile out of sync with package.json — re-run `npm install` locally and commit |
 | TTS audio plays once then breaks on subsequent taps in Safari | Already fixed in commit `dc5354d` (AbortError swallow) |
+| Endless 401 loop after sign-in | `AUTH_ALLOWED_USERS` doesn't include your GitHub username (case-sensitive). Or the GitHub OAuth callback URL is wrong. |
+| Endless redirect to /login on every page | `responseOverrides.401` and route `allowedRoles: ["authenticated"]` are both applied to the login route itself. Verify the explicit `/login` and `/.auth/*` routes come BEFORE the catch-all in `staticwebapp.config.json`. |

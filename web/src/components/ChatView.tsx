@@ -98,7 +98,9 @@ export function ChatView({ scenarioId, voice, showTranslation, handsFree }: Prop
     if (lastIndex === autoSpokenIndexRef.current) return;
     autoSpokenIndexRef.current = lastIndex;
     void autoSpeakAndListen(last.reply.reply_pt);
-  }, [turns, handsFree, voice]);
+    // voice intentionally omitted — autoSpeakAndListen reads voiceRef.current
+    // and we don't want a voice change mid-conversation to re-speak past turns.
+  }, [turns, handsFree]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -131,11 +133,13 @@ export function ChatView({ scenarioId, voice, showTranslation, handsFree }: Prop
       setAutoSpeaking(false);
     }
 
-    // After speaking, auto-listen if still in hands-free and not mid-API.
+    // After speaking (which can take seconds), auto-listen if still in
+    // hands-free and not mid-API. Read recorder via ref because the captured
+    // recorder.state from this render is stale by now.
     if (!handsFreeRef.current || busyRef.current) return;
-    if (recorder.state !== "idle") return;
+    if (recorderApiRef.current.state !== "idle") return;
     recordingModeRef.current = "hands-free";
-    await recorder.start({ autoStopOnSilence: true });
+    await recorderApiRef.current.start({ autoStopOnSilence: true });
   }
 
   async function start() {
