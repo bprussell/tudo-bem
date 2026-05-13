@@ -3,6 +3,7 @@ dist/
 build/
 .vite/
 .azure/
+infra/main.json
 .env
 .env.local
 local.settings.json
