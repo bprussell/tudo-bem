@@ -158,7 +158,8 @@ GitHub → **Actions** tab → watch the workflow run. Two jobs:
 - `CI` (typecheck + tests)
 
 Both should be green. The SWA job emits a deploy URL — typically
-`https://<random-words>.azurestaticapps.net`.
+`https://<random-words>.azurestaticapps.net`. (This deployment lives at
+https://proud-ground-0bffca10f.7.azurestaticapps.net.)
 
 ---
 

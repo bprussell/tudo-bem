@@ -3,6 +3,8 @@
 European Portuguese travel-prep tutor. PWA + Azure Functions + Azure Speech +
 Azure OpenAI. See [PLAN.md](./PLAN.md) for design and roadmap.
 
+Deployed at https://proud-ground-0bffca10f.7.azurestaticapps.net (gated by GitHub OAuth allowlist).
+
 ## Layout
 
 ```
