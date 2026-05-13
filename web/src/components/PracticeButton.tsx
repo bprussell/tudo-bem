@@ -22,6 +22,7 @@ export function PracticeButton({ referenceText }: Props) {
     setError(null);
     try {
       const reply = await transcribe(blob, referenceText);
+      console.debug("[practice] stt reply", reply);
       setResult(reply);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -62,8 +63,27 @@ export function PracticeButton({ referenceText }: Props) {
       {(error || recorder.error) && (
         <span className="tts-error">{error ?? recorder.error}</span>
       )}
-      {result?.pronunciation && (
+      {result && <PracticeResult result={result} />}
+    </div>
+  );
+}
+
+function PracticeResult({ result }: { result: STTReply }) {
+  const transcript = result.transcript.trim();
+  if (!transcript && !result.pronunciation) {
+    return <div className="practice-empty">Couldn't hear that — try again.</div>;
+  }
+  return (
+    <div className="practice-result">
+      {transcript && (
+        <div className="transcript">
+          <span className="transcript-label">Heard:</span> {transcript}
+        </div>
+      )}
+      {result.pronunciation ? (
         <ScoreBreakdown pronunciation={result.pronunciation} mock={result.mock} />
+      ) : (
+        <div className="practice-empty">No pronunciation score returned for that clip.</div>
       )}
     </div>
   );
