@@ -7,6 +7,12 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      workbox: {
+        // Don't let the SPA navigation fallback swallow Azure SWA auth routes.
+        // Without this, navigating to /.auth/login/github or /.auth/me serves
+        // the cached index.html, so login silently never happens.
+        navigateFallbackDenylist: [/^\/\.auth\//, /^\/login$/, /^\/logout$/, /^\/api\//],
+      },
       manifest: {
         name: "Tudo Bem",
         short_name: "TudoBem",
